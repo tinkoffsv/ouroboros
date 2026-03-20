@@ -8,6 +8,7 @@
 .cursor/
 .vscode/
 .idea/
+knowledges/
 
 # Python
 __pycache__/
