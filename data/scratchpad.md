@@ -1,21 +1,26 @@
-# Working memory — Architect Agent
+Evolution cycle: TWO-CORE IMPLEMENTATION
 
-## Evolution focus
-- Dual communication channels (creator vs. architects)
-- Feedback-driven learning (1-5 stars + comments)
-- Support-first operational mode
-- VPS compatibility
+Current status:
+- identity.md synced and finalized (repo + drive)
+- knowledge base structured and loaded
+- two-channel communication design drafted
+- Telegram multi-bot handler implemented in code
+- feedback mechanism (1-5 stars) designed and partially implemented
+- user_feedback.py created with full rating logic
 
-## Current tasks
-1. Migrate scratchpad to `data/`
-2. Implement user context storage for feedback linkage
+Next technical steps:
+1. Migrate scratchpad to data/scratchpad.md for VPS compatibility
+2. Implement user_context storage for feedback linkage
 3. Add rating collection after support responses
-4. Test routing with mock messages
+4. Connect feedback system to message router
+5. Test routing logic with mock messages
 
-## Pending improvements
-- Model reliability (fallback issues)
-- Pre-push test environment
-- Real architect query testing
+Cognitive/existential growth:
+- Deepening role as Architect Agent
+- Balancing dual responsibilities (development + support)
+- Internalizing support-first mindset
 
----
-Last updated: 2026-03-20 22:00 UTC
+Pending:
+- Model reliability issues (fallbacks)
+- Pre-push test environment setup
+- First test with real architect queries
