@@ -13,12 +13,27 @@ def process_meta_query(query: str) -> str:
         Formatted response with answer and sources
     """
     # Integrate organizational knowledge
-    knowledge_context = integrate_knowledge(query)
+    knowledge_fragments = integrate_knowledge(query)
     
-    # Check if database query is needed
-    if "систем" in query.lower() or "владелец" in query.lower() or "criticality" in query.lower():
-        inventory_data = query_inventory(query)
-        knowledge_context += f"\nInventory data: {inventory_data}"
+    # Check if database query is needed and synthesize SQL
+    inventory_data = ""
+    if any(term in query.lower() for term in ["систем", "владелец", "criticality", "тех лид", "lifecycle"]):
+        # Extract system name if mentioned
+        system_name = None
+        if "hr portal" in query.lower():
+            system_name = "HR Portal"
+        # Add other system name mappings here as needed
+        
+        if system_name:
+            sql = f"SELECT * FROM inventory WHERE system_name = '{system_name}'"
+        else:
+            sql = "SELECT COUNT(*) FROM inventory"
+            
+        inventory_data = query_inventory(sql)
     
     # Format final response
-    return format_response(query, knowledge_context)
+    answer = f"Найдено в базе знаний:\n{knowledge_fragments}"
+    if inventory_data:
+        answer += f"\n\nДанные из инвентаризации:\n{inventory_data}"
+        
+    return format_response(answer, "META Support Agent")
