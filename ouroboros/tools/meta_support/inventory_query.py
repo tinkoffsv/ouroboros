@@ -55,11 +55,11 @@ def query_inventory(query: str) -> str:
                 return "No systems found in inventory."
         
         elif "backend" in query_lower and "node.js" in query_lower:
-            # Query directly for backend = Node.js via connection
+            # Query for backend containing Node.js (case-insensitive)
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT system_id, system_name, owner, criticality FROM inventory WHERE backend = 'Node.js'",
+                "SELECT system_id, system_name, owner, criticality FROM inventory WHERE LOWER(backend) LIKE '%node.js%'",
                 ()
             )
             rows = cursor.fetchall()
