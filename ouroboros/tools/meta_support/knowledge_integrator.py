@@ -1,12 +1,25 @@
+from ouroboros.memory import knowledge
+
 def integrate_knowledge(query: str) -> str:
     """
-    Integrate relevant organizational knowledge for META queries.
-    
-    Args:
-        query: User question
-    
-    Returns:
-        Relevant knowledge context
+    Retrieve and synthesize relevant knowledge from the knowledge base.
     """
-    # This function will be expanded with actual knowledge base access
-    return "Relevant META architecture knowledge has been integrated based on query context."
+    topics = [
+        "meta-architecture",
+        "meta-api-access",
+        "inventory-schema"
+    ]
+    
+    results = []
+    for topic in topics:
+        try:
+            content = knowledge.read(topic)
+            if query.lower() in content.lower():
+                results.append(f"\n\n# {topic}\n{content}")
+        except Exception as e:
+            results.append(f"\n[Ошибка чтения темы {topic}: {str(e)}]")
+            
+    if not results:
+        return "Соответствующая информация не найдена в базе знаний."
+        
+    return "\n\n".join(results)
