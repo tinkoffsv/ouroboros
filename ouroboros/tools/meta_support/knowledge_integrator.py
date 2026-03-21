@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from ouroboros.tools import knowledge_read
+from tools import knowledge_read
 
 def integrate_knowledge(query: str) -> str:
     """
