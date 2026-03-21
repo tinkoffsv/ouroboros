@@ -1,6 +1,6 @@
 from .knowledge_integrator import integrate_knowledge
 from .inventory_query import query_inventory
-from .response_formatter import format_response, format_error
+from .response_formatter import format_response, format_error, format_general_response
 from typing import Dict, Any
 
 def handle_support_query(query: str) -> str:
@@ -16,7 +16,12 @@ def handle_support_query(query: str) -> str:
     Returns:
         str: Formatted response for the user
     """
-    query_lower = query.lower()
+    query_lower = query.lower().strip()
+    
+    # Handle simple greeting/start commands
+    if query_lower in ['/start', '/hello', 'start', 'привет', 'здравствуйте', 'hi', 'hello']:
+        general_info = "Привет! Это агент поддержки МЕТА. Готов помочь с вопросами по архитектуре, инвентаризации и стандартам.\n\nПримеры вопросов:\n- «Сколько систем с критичностью High?»\n- «Кто владелец CRM Core?»\n- «Как узнать архитектора системы?»\n- «Есть ли у МЕТА API?»\n- «Как сообщить о проблеме в МЕТА?»"
+        return format_general_response(general_info)
     
     try:
         # Determine query type based on keywords
@@ -43,7 +48,7 @@ def handle_support_query(query: str) -> str:
         else:
             # Default response for unrecognized queries
             general_info = "Я — агент поддержки МЕТА. Готов помочь с вопросами по архитектуре, инвентаризации и стандартам.\n\nПримеры вопросов:\n- «Сколько систем с критичностью High?»\n- «Как узнать владельца CRM Core?»\n- «Есть ли у МЕТА API?»\n- «Как сообщить о проблеме в МЕТА?»"
-            return format_response('general', general_info)
+            return format_general_response(general_info)
             
     except Exception as e:
         error_msg = f"Произошла ошибка при обработке запроса: {str(e)}"
@@ -71,3 +76,4 @@ def get_agent_status() -> Dict[str, Any]:
             "inventory-csv"
         ]
     }
+    
