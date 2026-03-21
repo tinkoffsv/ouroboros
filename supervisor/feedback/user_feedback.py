@@ -1,116 +1,72 @@
-from typing import Dict, Any
+from __future__ import annotations
+
+import datetime
+import json
 import logging
+import pathlib
+from typing import Dict, Any, Optional
 
 class UserFeedbackManager:
     """
-    Manages feedback collection from support users.
-    Implements 1-5 star rating with optional comments for ratings 3 and below.
+    Manages user feedback collection and storage.
     """
-    
-    def __init__(self, storage_path: str = "memory/feedback"):
-        self.storage_path = storage_path
+
+    def __init__(self, drive_root: pathlib.Path):
+        self.drive_root = drive_root
+        self.feedback_dir = drive_root / "memory" / "feedback"
+        self.feedback_dir.mkdir(parents=True, exist_ok=True)
         self.log = logging.getLogger(__name__)
-        self._ensure_storage_dir()
-    
-    def _ensure_storage_dir(self):
-        """Ensure feedback storage directory exists"""
-        import os
-        if not os.path.exists(self.storage_path):
-            os.makedirs(self.storage_path, exist_ok=True)
-    
-    def request_feedback(self, user_id: int, message_id: int, context: Dict[str, Any]) -> Dict[str, Any]:
+
+    def store_feedback(self, user_id: str, task_id: str, rating: int, comment: Optional[str] = None) -> None:
         """
-        Request feedback from user after a support response.
-        
-        Returns structured feedback request.
+        Store user feedback for a specific task.
         """
-        return {
+        if rating < 1 or rating > 5:
+            raise ValueError("Rating must be between 1 and 5")
+            
+        feedback = {
             "user_id": user_id,
-            "message_id": message_id,
-            "request_id": f"fb_{user_id}_{message_id}",
-            "context": context,
-            "prompt": "Оцените, насколько ответ был полезен: 1-5 ★",
-            "options": ["1 ★", "2 ★", "3 ★", "4 ★", "5 ★"],
-            "request_type": "rating"
-        }
-    
-    def process_feedback(self, feedback_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Process received feedback.
-        If rating <= 3, ask for comment.
-        """
-        rating = feedback_data.get("rating")
-        user_id = feedback_data.get("user_id")
-        message_id = feedback_data.get("message_id")
-        
-        if rating is None:
-            self.log.warning(f"Missing rating in feedback data: {feedback_data}")
-            return {"status": "error", "message": "Rating is required"}
-        
-        # Save feedback
-        self._save_feedback(feedback_data)
-        
-        # If low rating, request comment
-        if rating <= 3:
-            return {
-                "follow_up": True,
-                "request_id": f"comment_{user_id}_{message_id}",
-                "prompt": "Пожалуйста, уточните, что было не так или что можно улучшить:" 
-            }
-        
-        return {
-            "follow_up": False,
-            "message": "Спасибо за высокую оценку!"
-        }
-    
-    def _save_feedback(self, feedback_data: Dict[str, Any]):
-        """Save feedback to storage"""
-        import json
-        import os
-        from datetime import datetime
-        
-        filename = f"{self.storage_path}/{feedback_data['user_id']}_{feedback_data['message_id']}.json"
-        
-        data = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "saved_at": datetime.now().isoformat(),
-            **feedback_data
+            "task_id": task_id,
+            "rating": rating,
+            "comment": comment,
+            "timestamp": json.dumps(datetime.datetime.now(datetime.timezone.utc), default=str)
         }
         
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        
-        self.log.info(f"Feedback saved: {filename}")
-    
+        file_path = self.feedback_dir / f"{user_id}_{task_id}.json"
+        try:
+            file_path.write_text(json.dumps(feedback, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.log.info(f"Stored feedback for user {user_id}, task {task_id}")
+        except Exception as e:
+            self.log.error(f"Failed to store feedback: {e}")
+            
     def get_feedback_stats(self) -> Dict[str, Any]:
-        """Get feedback statistics"""
-        import os
-        import json
-        
+        """
+        Return statistics about collected feedback.
+        """
         stats = {
-            "total": 0,
-            "by_rating": {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-            "average_rating": 0.0
+            "total_feedback": 0,
+            "average_rating": 0.0,
+            "ratings": {i: 0 for i in range(1, 6)}
         }
         
-        if not os.path.exists(self.storage_path):
+        if not self.feedback_dir.exists():
             return stats
             
-        files = [f for f in os.listdir(self.storage_path) if f.endswith('.json')]
+        feedback_files = list(self.feedback_dir.glob("*.json"))
+        stats["total_feedback"] = len(feedback_files)
         
-        for file in files:
+        total_score = 0
+        for file_path in feedback_files:
             try:
-                with open(f"{self.storage_path}/{file}", 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    rating = data.get('rating')
-                    if rating:
-                        stats["total"] += 1
-                        stats["by_rating"][rating] += 1
+                data = json.loads(file_path.read_text(encoding="utf-8"))
+                rating = data.get("rating", 0)
+                if 1 <= rating <= 5:
+                    stats["ratings"][rating] += 1
+                    total_score += rating
             except Exception as e:
-                self.log.error(f"Error reading feedback file {file}: {e}")
-        
-        if stats["total"] > 0:
-            total_rating = sum(r * c for r, c in stats["by_rating"].items())
-            stats["average_rating"] = round(total_rating / stats["total"], 2)
+                self.log.error(f"Failed to read feedback file {file_path}: {e}")
+
+        if stats["total_feedback"] > 0:
+            stats["average_rating"] = total_score / stats["total_feedback"]
             
         return stats
