@@ -1,12 +1,13 @@
-def format_response(query: str, context: str) -> str:
+def format_response(answer: str, source: str = "") -> str:
     """
-    Format a structured response to a META architecture query.
-    
-    Args:
-        query: Original user question
-        context: Combined knowledge and data context
-    
-    Returns:
-        Formatted response
+    Format the final response for user delivery.
     """
-    return f"Ответ на ваш вопрос: '{query}'\n\n{context}\n\nОтвет сформирован на основе актуальной информации из системы МЕТА."
+    if source:
+        return f"{answer}\n\nИсточник: {source}"
+    return answer
+        
+def format_error(error: str) -> str:
+    """
+    Format error messages for user delivery.
+    """
+    return f"⚠️ {error}"
