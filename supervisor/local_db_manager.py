@@ -56,6 +56,7 @@ def load_csv_to_db(csv_data: str):
     cursor.execute('DELETE FROM inventory')
     
     # Insert new data
+    row_count = 0
     for row in reader:
         cursor.execute('''
             INSERT INTO inventory (
@@ -79,14 +80,10 @@ def load_csv_to_db(csv_data: str):
             row['Vendor / Custom'],
             row['Last Update']
         ))
+        row_count += 1
     
     conn.commit()
     conn.close()
-    
-    # Count total rows from the CSV data
-    csv_file = StringIO(csv_data)
-    reader = csv.DictReader(csv_file, delimiter=';')
-    row_count = sum(1 for _ in reader)
     
     return {'success': True, 'message': f'Data loaded successfully. Total rows: {row_count}'}
 
@@ -95,6 +92,7 @@ def query_systems_by_criticality(criticality: str) -> List[Dict[str, Any]]:
     conn = get_db_connection()
     cursor = conn.cursor()
     
+    # Fixed to use correct column name 'system_id'
     cursor.execute(
         'SELECT system_id, system_name, domain, owner, criticality FROM inventory WHERE criticality = ?', 
         (criticality,)
@@ -108,6 +106,7 @@ def get_all_systems() -> List[Dict[str, Any]]:
     """Get all systems from the inventory."""
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fixed to use correct column names
     cursor.execute('SELECT system_id, system_name, domain, owner, criticality FROM inventory')
     rows = cursor.fetchall()
     conn.close()
