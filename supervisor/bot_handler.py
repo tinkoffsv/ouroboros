@@ -4,8 +4,8 @@ from typing import Dict, Any, Optional
 import os
 import logging
 
-# Import feedback manager
-from feedback_manager import UserFeedbackManager
+# Import feedback manager correctly
+from supervisor.feedback_manager import UserFeedbackManager
 
 class BotHandler:
     """
