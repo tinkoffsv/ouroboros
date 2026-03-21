@@ -1,39 +1,73 @@
 from .knowledge_integrator import integrate_knowledge
 from .inventory_query import query_inventory
-from .response_formatter import format_response
+from .response_formatter import format_response, format_error
+from typing import Dict, Any
 
-def process_meta_query(query: str) -> str:
+def handle_support_query(query: str) -> str:
     """
-    Process a user query about META architecture.
+    Handle a user query for the META first-line support agent.
+    
+    This is the main orchestrator that routes queries to the appropriate
+    data sources and formats the response.
     
     Args:
-        query: User question in natural language
+        query (str): User's natural language question
     
     Returns:
-        Formatted response with answer and sources
+        str: Formatted response for the user
     """
-    # Integrate organizational knowledge
-    knowledge_fragments = integrate_knowledge(query)
+    query_lower = query.lower()
     
-    # Check if database query is needed and synthesize SQL
-    inventory_data = ""
-    if any(term in query.lower() for term in ["систем", "владелец", "criticality", "тех лид", "lifecycle"]):
-        # Extract system name if mentioned
-        system_name = None
-        if "hr portal" in query.lower():
-            system_name = "HR Portal"
-        # Add other system name mappings here as needed
+    try:
+        # Determine query type based on keywords
+        needs_inventory = any(kw in query_lower for kw in ['criticality', 'high', 'critical', 'medium', 'low', 'system', 'backend', 'node.js', 'list all'])
+        needs_knowledge = any(kw in query_lower for kw in ['api', 'architecture', 'model', 'standards', 'governance', 'support', 'help', 'process'])
         
-        if system_name:
-            sql = f"SELECT * FROM inventory WHERE system_name = '{system_name}'"
-        else:
-            sql = "SELECT COUNT(*) FROM inventory"
+        if needs_inventory and needs_knowledge:
+            # Mixed query - get both data and knowledge
+            inventory_result = query_inventory(query)
+            knowledge_result = integrate_knowledge(query)
+            combined = f"{inventory_result}\n\nДополнительный контекст:\n{knowledge_result}"
+            return format_response('mixed', combined, 'meta-architecture')
             
-        inventory_data = query_inventory(sql)
+        elif needs_inventory:
+            # Pure inventory query
+            result = query_inventory(query)
+            return format_response('inventory', result)
+            
+        elif needs_knowledge:
+            # Pure knowledge query
+            result = integrate_knowledge(query)
+            return format_response('knowledge', result, 'meta-architecture')
+            
+        else:
+            # Default response for unrecognized queries
+            general_info = "Я — агент поддержки МЕТА. Готов помочь с вопросами по архитектуре, инвентаризации и стандартам.\n\nПримеры вопросов:\n- «Сколько систем с критичностью High?»\n- «Как узнать владельца CRM Core?»\n- «Есть ли у МЕТА API?»\n- «Как сообщить о проблеме в МЕТА?»"
+            return format_response('general', general_info)
+            
+    except Exception as e:
+        error_msg = f"Произошла ошибка при обработке запроса: {str(e)}"
+        return format_error(error_msg)
+
+
+def get_agent_status() -> Dict[str, Any]:
+    """
+    Get status information about the support agent.
     
-    # Format final response
-    answer = f"Найдено в базе знаний:\n{knowledge_fragments}"
-    if inventory_data:
-        answer += f"\n\nДанные из инвентаризации:\n{inventory_data}"
-        
-    return format_response(answer, "META Support Agent")
+    Returns:
+        Dict with agent status and capabilities
+    """
+    return {
+        "status": "active",
+        "capabilities": [
+            "Answer questions about system criticality",
+            "Provide knowledge about META architecture",
+            "List systems by technology stack",
+            "Explain API access policies"
+        ],
+        "knowledge_sources": [
+            "meta-architecture",
+            "meta-api-access",
+            "inventory-csv"
+        ]
+    }
