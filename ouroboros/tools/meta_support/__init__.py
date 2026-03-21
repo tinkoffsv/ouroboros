@@ -1,7 +1,4 @@
-"""
-Registers the meta_support tool for use by Ouroboros.
-"""
-
+from typing import Dict, Any
 from . import handler
 
 TOOLS = [
@@ -39,3 +36,10 @@ def call_tool(tool_name: str, args: Dict[str, Any]) -> str:
         return handler.handle_support_query(args["query"])
     else:
         return f"Unknown tool: {tool_name}"
+
+def get_tools() -> list:
+    """
+    Return the list of tools this module provides.
+    Required for tool discovery by the registry.
+    """
+    return TOOLS
