@@ -1,12 +1,24 @@
-def query_inventory(query: str) -> str:
+from supervisor.local_db_manager import DatabaseManager
+
+def query_inventory(sql_query: str) -> str:
     """
-    Query the inventory database for information about systems.
-    
-    Args:
-        query: User question that may require data lookup
-    
-    Returns:
-        Query result as string
+    Execute a read-only SQL query against the inventory database.
+    Returns results as a formatted string.
     """
-    # This function will interface with local_db_manager.py
-    return "Inventory query executed and results retrieved."
+    try:
+        db = DatabaseManager()
+        results = db.execute_query(sql_query)
+        db.close()
+        
+        if not results:
+            return "Запрос выполнен, но данные не найдены."
+            
+        # Format results
+        output = []
+        for row in results:
+            output.append(" | ".join(str(v) for v in row))
+        
+        return "\n".join(output)
+    
+    except Exception as e:
+        return f"Ошибка выполнения запроса: {str(e)}"
