@@ -83,7 +83,12 @@ def load_csv_to_db(csv_data: str):
     conn.commit()
     conn.close()
     
-    return {'success': True, 'message': f'Data loaded successfully. Total rows: {list(reader)[-1]}'}
+    # Count total rows from the CSV data
+    csv_file = StringIO(csv_data)
+    reader = csv.DictReader(csv_file, delimiter=';')
+    row_count = sum(1 for _ in reader)
+    
+    return {'success': True, 'message': f'Data loaded successfully. Total rows: {row_count}'}
 
 def query_systems_by_criticality(criticality: str) -> List[Dict[str, Any]]:
     """Query the database for systems with a specific criticality."""
