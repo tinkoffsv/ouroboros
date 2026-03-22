@@ -19,9 +19,12 @@ def handle_support_query(query: str) -> str:
     query_lower = query.lower().strip()
     
     # Handle simple greeting/start commands
-    if query_lower in ['/start', '/hello', 'start', 'привет', 'здравствуйте', 'hi', 'hello']:
-        general_info = "Привет! Это агент поддержки МЕТА. Готов помочь с вопросами по архитектуре, инвентаризации и стандартам.\n\nПримеры вопросов:\n- «Сколько систем с критичностью High?»\n- «Кто владелец CRM Core?»\n- «Как узнать архитектора системы?»\n- «Есть ли у МЕТА API?»\n- «Как сообщить о проблеме в МЕТА?»"
-        return format_general_response(general_info)
+    if query_lower in ['/start', '/hello', 'start', 'привет', 'здравствуйте', 'hi', 'hello', 'good morning', 'доброе утро']:
+        return "Hi, it is META support. What do you want?"
+    
+    # Handle other basic greeting variations
+    if query_lower in ['hello', 'hi there', 'hey', 'приветик', 'здарова']:
+        return "Hi, it is META support. What do you want?"
     
     try:
         # Determine query type based on keywords
@@ -76,4 +79,3 @@ def get_agent_status() -> Dict[str, Any]:
             "inventory-csv"
         ]
     }
-    
