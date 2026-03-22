@@ -1,68 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>META Support Chat</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f7fa; }
-        #chat { height: 70vh; overflow-y: scroll; border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: white; }
-        .message { padding: 10px; margin: 5px 0; border-radius: 12px; max-width: 80%; }
-        .user { background: #e3f2fd; align-self: flex-end; margin-left: auto; }
-        .agent { background: #f0f0f0; align-self: flex-start; }
-        .message-container { display: flex; margin: 5px 0; }
-        .user-container { justify-content: flex-end; }
-        input, button { padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; }
-        #messageInput { width: 70%; }
-        button { width: 28%; background: #1976d2; color: white; border: none; cursor: pointer; }
-        button:hover { background: #1565c0; }
-    </style>
-</head>
-<body>
-    <h1>META Support Chat</h1>
-    <div id="chat"></div>
-    <div>
-        <input type="text" id="messageInput" placeholder="Ask your question about META...">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        function addMessage(text, isUser) {
-            const chat = document.getElementById('chat');
-            const messageContainer = document.createElement('div');
-            messageContainer.className = `message-container ${isUser ? 'user-container' : ''}'`;
-            
-            const message = document.createElement('div');
-            message.className = `message ${isUser ? 'user' : 'agent'}';
-            message.textContent = text;
-            
-            messageContainer.appendChild(message);
-            chat.appendChild(messageContainer);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            
-            if (text) {
-                addMessage(text, true);
-                // Simulate agent response
-                setTimeout(() => {
-                    let response = "Hi, it's META support. I'm currently a basic interface. My core agent is Ouroboros — and this connection will be live soon. What do you want?";
-                    addMessage(response, false);
-                }, 500);
-                
-                input.value = '';
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chat: {
+                            bg: '#f5f7fb',
+                            agent: '#e1f0ff',
+                            user: '#d0ebc0'
+                        }
+                    }
+                }
             }
         }
+    </script>
+</head>
+<body class="bg-chat-bg font-sans leading-normal">
+    <div class="max-w-2xl mx-auto p-4">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Поддержка МЕТА</h1>
+            <p class="text-gray-600">Задайте ваш вопрос об архитектуре и системах</p>
+        </header>
 
-        // Initial greeting
-        window.onload = () => {
-            setTimeout(() => {
-                addMessage("Hello! This is the new META support chat. I'm a live interface to the architecture system. Ask me about systems, components, or procedures.", false);
-            }, 500);
-        };
+        <div id="chat" class="bg-white rounded-lg shadow-md p-4 h-96 overflow-y-auto mb-4 border">
+            <div class="mb-4">
+                <div class="bg-blue-100 rounded-lg p-3 inline-block max-w-xs">
+                    <p class="text-gray-800 text-sm">Здравствуйте! Я — агент поддержки МЕТА. Чем могу помочь?</p>
+                    <div class="text-xs text-gray-500 mt-1 text-right">10:30</div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mb-4">
+                <div class="bg-green-100 rounded-lg p-3 inline-block max-w-xs">
+                    <p class="text-gray-800 text-sm">Как узнать критичность систем?</p>
+                    <div class="text-xs text-gray-500 mt-1 text-right">10:31</div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-blue-100 rounded-lg p-3 inline-block max-w-xs">
+                    <p class="text-gray-800 text-sm">Критичность систем можно проверить:
+                    <br>• Через запрос в базу инвентаризации
+                    <br>• В карточке системы в МЕТА</p>
+                    <div class="text-xs text-gray-500 mt-1 text-right">10:31</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <input 
+                type="text" 
+                placeholder="Введите ваш вопрос..." 
+                class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Отправить
+            </button>
+        </div>
+
+        <p class="text-center text-gray-500 text-xs mt-4">
+            Веб-интерфейс для поддержки МЕТА • Версия 1.0
+        </p>
+    </div>
+    <script>
+        const chat = document.getElementById('chat');
+        const input = document.querySelector('input');
+        const button = document.querySelector('button');
+        
+        function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'flex justify-end mb-4';
+            userMsg.innerHTML = `
+                <div class="bg-green-100 rounded-lg p-3 inline-block max-w-xs">
+                    <p class="text-gray-800 text-sm">${text}</p>
+                    <div class="text-xs text-gray-500 mt-1 text-right">${new Date().toLocaleTimeString('ru', {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>`;
+            chat.appendChild(userMsg);
+            
+            // Add agent response
+            const agentMsg = document.createElement('div');
+            agentMsg.className = 'mb-4';
+            agentMsg.innerHTML = `
+                <div class="bg-blue-100 rounded-lg p-3 inline-block max-w-xs">
+                    <p class="text-gray-800 text-sm">Спасибо за вопрос. Я работаю над ответом.</p>
+                    <div class="text-xs text-gray-500 mt-1 text-right">${new Date().toLocaleTimeString('ru', {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>`;
+            chat.appendChild(agentMsg);
+            
+            chat.scrollTop = chat.scrollHeight;
+            input.value = '';
+        }
+        
+        button.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>
