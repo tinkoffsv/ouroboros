@@ -1,0 +1,33 @@
+C4Context {
+  Person(employee, "Employee", "End user who accesses personal HR functions.")
+  Person(hr_specialist, "HR Specialist", "HR employee who manages personnel operations and requests.")
+  Person(sys_admin, "System Administrator", "Technical user responsible for configuration and support.")
+
+  Enterprise_Boundary("HR Portal System", "HR") {
+    Container(web_ui, "Web UI", "React", "Render screens, submit actions, display data.")
+    Container(backend, "Backend Service", "Django", "Business logic, validation, workflow coordination.")
+    ContainerDb(database, "Database", "PostgreSQL", "Store employee data, workflows, config.")
+
+    System_Ext(identity_provider, "Identity Provider", "LDAP", "Authenticate users, provide identity.")
+    System_Ext(payroll_system, "Payroll System", "External", "Provide payroll data.")
+    System_Ext(document_service, "Document Service", "Node.js + MongoDB", "Store and provide HR documents.")
+    System_Ext(crm_core, "CRM Core", ".NET Core + MS SQL", "Provide employee contact data.")
+    System_Ext(notification_service, "Notification Service", "SMTP", "Send approval notifications.")
+    System_Ext(data_warehouse, "Data Warehouse", "Snowflake", "HR snapshots for reporting.")
+    System_Ext(risk_engine, "Risk Engine", "Python (FastAPI)", "Compliance checks for HR ops.")
+
+    Rel(employee, web_ui, "Uses", "HTTPS")
+    Rel(hr_specialist, web_ui, "Uses", "HTTPS")
+    Rel(sys_admin, web_ui, "Manages", "HTTPS")
+
+    Rel(web_ui, backend, "Submits actions", "HTTPS/REST")
+    Rel(backend, database, "Reads/Writes", "SQL")
+    Rel(backend, identity_provider, "Authenticates", "LDAP")
+    Rel(backend, payroll_system, "Exchanges data", "REST/SOAP")
+    Rel(backend, document_service, "Stores/Retrieves", "HTTPS/REST")
+    Rel(backend, crm_core, "Synchronizes data", "HTTPS/REST")
+    Rel(backend, notification_service, "Sends via", "SMTP")
+    Rel(backend, data_warehouse, "Exports data", "ETL/Batch")
+    Rel(backend, risk_engine, "Validates actions", "HTTPS/REST")
+  }
+}
