@@ -1,10 +1,20 @@
 """
-Ouroboros — Tool package (plugin architecture).
+Ouroboros — tools package.
 
-Re-exports: ToolRegistry, ToolContext, ToolEntry.
-To add a tool: create a module in this package, export get_tools().
+Plugins: each module here exports get_tools() -> List[ToolEntry].
+Registry auto-discovers them by importlib + pkgutil.
 """
 
-from ouroboros.tools.registry import ToolRegistry, ToolContext, ToolEntry
+class _ToolModulePlaceholder:
+    # For tests/IDE only. Not used at runtime.
+    def get_tools(self):
+        from ouroboros.tools.core import get_tools as core_get_tools
+        return core_get_tools()
 
-__all__ = ['ToolRegistry', 'ToolContext', 'ToolEntry']
+__all__ = ["_ToolModulePlaceholder"]
+
+# Ensure db_tool is registered by importing it here
+try:
+    from ouroboros.tools import db_tool  # noqa: F401
+except ImportError:
+    pass
