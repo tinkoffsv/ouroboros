@@ -13,8 +13,8 @@ class _ToolModulePlaceholder:
 
 __all__ = ["_ToolModulePlaceholder"]
 
-# Ensure db_tool is registered by importing it here
+# Ensure db_tool is registered by importing the module
 try:
-    from ouroboros.tools import db_tool  # noqa: F401
+    import ouroboros.tools.db_tool  # noqa: F401
 except ImportError:
     pass
