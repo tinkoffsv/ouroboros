@@ -9,7 +9,7 @@ class DatabaseTool:
     Designed to replace bloated JSON state files with structured, queryable storage.
     """
 
-    def __init__(self, db_path: str = "/home/user1/ouroboros_data/local_db/inventory.db"):
+    def __init__(self, db_path: str = "/home/admin/ouroboros_data/local_db/inventory.db"):
         self.db_path = db_path
 
     def db_query(self, query: str, params: Optional[tuple] = None) -> List[Dict[str, Any]]:
@@ -26,6 +26,8 @@ class DatabaseTool:
                     cursor.execute(query)
                 rows = cursor.fetchall()
                 return [dict(row) for row in rows]
+        except sqlite3.Error as e:
+            return [{"error": f"Database error: {str(e)}"}]
         except Exception as e:
             return [{"error": f"Query failed: {str(e)}"}]
 
