@@ -117,3 +117,17 @@ def get_all_systems() -> List[Dict[str, Any]]:
     conn.close()
     
     return [dict(row) for row in rows]
+
+def get_system_detail(system_id: str) -> Dict[str, Any]:
+    """Get detailed information about a specific system by its ID."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM inventory WHERE system_id = ?
+    ''', (system_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row is None:
+        return {}
+    return dict(row)
