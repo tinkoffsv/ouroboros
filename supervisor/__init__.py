@@ -1,14 +1,16 @@
 """Ouroboros Supervisor package — decomposed from monolithic colab_launcher.py."""
 
-from .supervisor import Supervisor
+# Import individual modules
 from .config import SupervisorConfig
 from .state import SupervisorState
 from .event_bus import EventBus
 from .worker_pool import WorkerPool
 
-# For backward compatibility, expose core types at package level
+# Supervisor module is not present - handle gracefully for now
+# from .supervisor import Supervisor
+
+# For backward compatibility, expose core classes at package level
 __all__ = [
-    "Supervisor",
     "SupervisorConfig",
     "SupervisorState",
     "EventBus",
