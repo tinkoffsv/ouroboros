@@ -3,7 +3,8 @@ import csv
 import os
 from typing import List, Dict, Any
 
-db_path = '/home/admin/ouroboros_data/local_db/inventory.db'
+db_path = '/home/user1/ouroboros_data/local_db/inventory.db'
+
 
 def get_db_connection():
     """Create and return a database connection."""
@@ -11,7 +12,8 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row  # This allows access by column name
     return conn
 
-def init_db():
+
+def init_inventory_db():
     """Initialize the database and create the inventory table if it doesn't exist."""
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = get_db_connection()
@@ -41,6 +43,7 @@ def init_db():
     conn.close()
     
     return {'success': True, 'message': f'Database initialized at {db_path}'}
+
 
 def load_csv_to_db(csv_data: str):
     """Parse the CSV data and load it into the SQLite database."""
@@ -87,6 +90,7 @@ def load_csv_to_db(csv_data: str):
     
     return {'success': True, 'message': f'Data loaded successfully. Total rows: {row_count}'}
 
+
 def query_systems_by_criticality(criticality: str) -> List[Dict[str, Any]]:
     """Query the database for systems with a specific criticality."""
     conn = get_db_connection()
@@ -101,6 +105,7 @@ def query_systems_by_criticality(criticality: str) -> List[Dict[str, Any]]:
     conn.close()
     
     return [dict(row) for row in rows]
+
 
 def get_all_systems() -> List[Dict[str, Any]]:
     """Get all systems from the inventory."""
