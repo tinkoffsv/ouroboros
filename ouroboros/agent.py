@@ -27,8 +27,7 @@ from ouroboros.utils import (
     get_git_info, sanitize_task_for_event,
 )
 from ouroboros.llm import LLMClient, add_usage
-from ouroboros.tools import ToolRegistry
-from ouroboros.tools.registry import ToolContext
+from ouroboros.tools.registry import ToolRegistry, ToolContext
 from ouroboros.memory import Memory
 from ouroboros.context import build_llm_messages
 from ouroboros.loop import run_llm_loop

@@ -1,45 +1,36 @@
-from typing import Dict, Any
-from . import handler
+"""META support tool for answering architecture questions."""
 
-TOOLS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "meta_support_query",
-            "description": "Answer first-line support questions about the META architecture system.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "The user's question about META architecture, inventory, or standards."
-                    }
-                },
-                "required": ["query"]
-            }
-        }
-    }
-]
+from typing import Any, Dict, List
 
-def call_tool(tool_name: str, args: Dict[str, Any]) -> str:
-    """
-    Call a specific tool from this module.
-    
-    Args:
-        tool_name (str): Name of the tool to call
-        args (Dict): Arguments for the tool
-    
-    Returns:
-        str: Result of the tool execution
-    """
-    if tool_name == "meta_support_query":
-        return handler.handle_support_query(args["query"])
-    else:
-        return f"Unknown tool: {tool_name}"
+from ouroboros.tools.registry import ToolContext, ToolEntry
+from ouroboros.tools.meta_support import handler
 
-def get_tools() -> list:
-    """
-    Return the list of tools this module provides.
-    Required for tool discovery by the registry.
-    """
-    return TOOLS
+
+def _meta_support_query(ctx: ToolContext, query: str) -> str:
+    """Answer questions about META architecture system."""
+    return handler.handle_support_query(query)
+
+
+def get_tools() -> List[ToolEntry]:
+    """Export meta_support_query tool for registry auto-discovery."""
+    return [
+        ToolEntry(
+            name="meta_support_query",
+            schema={
+                "name": "meta_support_query",
+                "description": "Answer first-line support questions about the META architecture system.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "The user's question about META architecture, inventory, or standards."
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+            handler=_meta_support_query,
+            timeout_sec=30
+        )
+    ]

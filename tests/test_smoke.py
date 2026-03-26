@@ -114,6 +114,10 @@ EXPECTED_TOOLS = [
     "compact_context",
     "list_available_tools",
     "enable_tools",
+    # Database access
+    "db_query",
+    # META support
+    "meta_support_query",
 ]
 
 
