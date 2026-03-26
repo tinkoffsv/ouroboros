@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from app.api import chat
 import uvicorn
+
+# Import routers
+from app.api import chat
 
 app = FastAPI(title="Ouroboros Web Chat", description="Web chat interface for Ouroboros agent")
 
