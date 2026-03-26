@@ -1,18 +1,8 @@
-"""Ouroboros Supervisor package — decomposed from monolithic colab_launcher.py."""
+from .local_db_manager import init_inventory_db, get_all_systems, get_system_detail
 
-# Import individual modules
-from .config import SupervisorConfig
-from .state import SupervisorState
-from .event_bus import EventBus
-from .worker_pool import WorkerPool
-
-# Supervisor module is not present - handle gracefully for now
-# from .supervisor import Supervisor
-
-# For backward compatibility, expose core classes at package level
+# Ensure the module is properly initialized
 __all__ = [
-    "SupervisorConfig",
-    "SupervisorState",
-    "EventBus",
-    "WorkerPool"
+    "init_inventory_db",
+    "get_all_systems",
+    "get_system_detail"
 ]
